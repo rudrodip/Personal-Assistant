@@ -32,6 +32,9 @@ async def on_message(message):
     if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
 
+    if message.guild:
+        return
+
     if prompt.startswith("self profile"):
         await message.channel.send(file=discord.File("babe.png"))
 
