@@ -7,6 +7,8 @@ from TextProcessing import process
 TOKEN = os.environ["BABE"]
 PERSONAL_ID = 841126921886498817
 
+GPT = False
+
 intents = discord.Intents.all()
 client = discord.Client(command_prefix="!", intents=intents)
 response_generator = process.Response('./TextProcessing/Database/config.json')
@@ -39,11 +41,19 @@ async def on_message(message):
             await send_img(message, img)
 
         await message.channel.send(prompt)
+    
+    if message.content == 'GPT ON':
+        GPT = True
+        await message.channel.send('Active 😊')
+    if message.content == 'GPT OFF':
+        GPT = False
+        await message.channel.send('Turned off')
 
-    prompt = message.content
-    if message.author.id == PERSONAL_ID:
-        response = response_generator.get_response(prompt)
-        if response:
-            await message.channel.send(response)
+    if GPT:
+        prompt = message.content
+        if message.author.id == PERSONAL_ID:
+            response = response_generator.get_response(prompt)
+            if response:
+                await message.channel.send(response)
 
 client.run(TOKEN)
