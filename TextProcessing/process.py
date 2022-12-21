@@ -49,6 +49,7 @@ class Response(TextProcessor):
 
     def create_context(self, author, text, response):
         with open(self.chat_log_path, 'a', encoding="utf-8") as f:
+            print('writing to context...')
             f.write(f"\n{author}: {text}\n{response}")
         
     def get_response(self, text):

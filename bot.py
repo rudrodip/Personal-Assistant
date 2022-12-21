@@ -27,13 +27,15 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
+    global GPT
+    prompt = message.content
     if message.author == client.user and message.author.id != PERSONAL_ID:
         pass
 
-    if message.content.startswith("self profile"):
+    if prompt.startswith("self profile"):
         await message.channel.send(file=discord.File("babe.png"))
 
-    if message.content.startswith("imagine"):
+    if prompt.startswith("imagine"):
         prompt = message.content.lstrip("imagine:").strip()
         await message.channel.send("Generating images....")
         images = response_generator.image_generator(prompt)
@@ -41,17 +43,17 @@ async def on_message(message):
             await send_img(message, img)
 
         await message.channel.send(prompt)
-    
-    if message.content == 'GPT ON':
+
+    if prompt == 'GPT OFF' and message.author == client.user:
+        GPT = False
+        await message.channel.send('Turned off 🤐')
+
+    if prompt == 'GPT ON' and message.author == client.user:
         GPT = True
         await message.channel.send('Active 😊')
-    if message.content == 'GPT OFF':
-        GPT = False
-        await message.channel.send('Turned off')
-
-    if GPT:
-        prompt = message.content
-        if message.author.id == PERSONAL_ID:
+    
+    if message.author.id == PERSONAL_ID and GPT:
+        if not prompt.startswtih("GPT"):
             response = response_generator.get_response(prompt)
             if response:
                 await message.channel.send(response)
