@@ -60,6 +60,7 @@ class Response(TextProcessor):
         bot = self.config["bot_name"]
 
         context = self.get_context()
+        print(context)
         prompt = f"{context}\n{author} : {text}"
         response = self.text_generator(prompt)
 
