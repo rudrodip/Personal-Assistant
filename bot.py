@@ -29,7 +29,7 @@ async def on_ready():
 async def on_message(message):
     global GPT
     prompt = message.content
-    if message.author == client.user and message.author.id != PERSONAL_ID:
+    if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
 
     if prompt.startswith("self profile"):
@@ -42,18 +42,16 @@ async def on_message(message):
         for img in images:
             await send_img(message, img)
 
-        await message.channel.send(prompt)
-
-    if prompt == 'GPT OFF' and message.author == client.user:
+    if prompt == 'GPT OFF' and message.author.id == PERSONAL_ID:
         GPT = False
         await message.channel.send('Turned off 🤐')
 
-    if prompt == 'GPT ON' and message.author == client.user:
+    if prompt == 'GPT ON' and message.author.id == PERSONAL_ID:
         GPT = True
         await message.channel.send('Active 😊')
     
     if message.author.id == PERSONAL_ID and GPT:
-        if not prompt.startswtih("GPT"):
+        if not prompt.startswith("GPT"):
             response = response_generator.get_response(prompt)
             if response:
                 await message.channel.send(response)

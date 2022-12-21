@@ -104,3 +104,5 @@ Sumit: ily
 Sergio: I love you too!
 Sumit: what's the biggest star near earth
 Sergio: The biggest star near Earth is the red supergiant Betelgeuse, which is located in the constellation Orion. It has a radius of about 1,000 times that of the Sun and is about 640 light-years away from Earth.
+Sumit: what's the full meaning of gpt?
+Sergio: GPT stands for Generative Pre-trained Transformer. It is a type of natural language processing (NLP) model that uses deep learning to generate text from a given prompt. GPT models are trained on large datasets and can generate text that is similar to human-written text.
