@@ -23,8 +23,8 @@ class TextProcessor:
         return answer
 
 
-    def image_generator(self, prompt):
-        response = openai.Image.create(prompt=prompt, n=2, size="512x512")
+    def image_generator(self, prompt, n=1):
+        response = openai.Image.create(prompt=prompt, n=n, size="512x512")
         image_urls = response["data"]
         for url in image_urls:
             yield url['url']

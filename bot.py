@@ -38,7 +38,9 @@ async def on_message(message):
     if prompt.startswith("imagine"):
         prompt = message.content.lstrip("imagine:").strip()
         await message.channel.send("Generating images....")
-        images = response_generator.image_generator(prompt)
+
+        number_of_images = int(prompt[-1]) if prompt[-1].isdigit() else 1
+        images = response_generator.image_generator(prompt, number_of_images)
         for img in images:
             await send_img(message, img)
             return
