@@ -32,9 +32,6 @@ async def on_message(message):
     if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
 
-    if message.guild:
-        return
-
     if prompt.startswith("self profile"):
         await message.channel.send(file=discord.File("babe.png"))
 
@@ -44,19 +41,24 @@ async def on_message(message):
         images = response_generator.image_generator(prompt)
         for img in images:
             await send_img(message, img)
+            return
 
-    if prompt == 'GPT OFF' and message.author.id == PERSONAL_ID:
+    if prompt == 'GPT OFF' and message.author.id == PERSONAL_ID and message.guild:
         GPT = False
         await message.channel.send('Turned off 🤐')
+        return
 
-    if prompt == 'GPT ON' and message.author.id == PERSONAL_ID:
+    if prompt == 'GPT ON' and message.author.id == PERSONAL_ID and message.guild:
         GPT = True
         await message.channel.send('Active 😊')
+        return
     
-    if message.author.id == PERSONAL_ID and GPT:
-        if not prompt.startswith("GPT"):
+    if message.author.id == PERSONAL_ID:
+        if not message.guild:
             response = response_generator.get_response(prompt)
-            if response:
-                await message.channel.send(response)
+            await message.channel.send(response)
+        if message.guild and GPT:
+            response = response_generator.get_response(prompt)
+            await message.channel.send(response)
 
 client.run(TOKEN)
