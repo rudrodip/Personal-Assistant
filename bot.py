@@ -29,7 +29,7 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global GPT, save
+    global GPT, PERMITTED_ACCOUNTS, save
     prompt = message.content.lower().strip()
     if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
@@ -66,6 +66,10 @@ async def on_message(message):
     if prompt == 'save on' and message.author.id == PERSONAL_ID:
         save = True
         await message.channel.send('context saving turned on 😊')
+        return
+
+    if prompt == 'refresh' and message.author.id == PERSONAL_ID:
+        PERMITTED_ACCOUNTS = db.get_accounts()
         return
     
     if message.author.id == PERSONAL_ID:
