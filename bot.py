@@ -7,7 +7,7 @@ from TextProcessing import process
 TOKEN = os.environ["BABE"]
 PERSONAL_ID = 841126921886498817
 
-GPT = False
+GPT, save = False, False
 
 intents = discord.Intents.all()
 client = discord.Client(command_prefix="!", intents=intents)
@@ -27,13 +27,14 @@ async def on_ready():
 
 @client.event
 async def on_message(message):
-    global GPT
+    global GPT, save
     prompt = message.content
     if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
 
     if prompt.startswith("self profile"):
         await message.channel.send(file=discord.File("babe.png"))
+        return
 
     if prompt.startswith("imagine"):
         prompt = message.content.lstrip("imagine:").strip()
@@ -54,13 +55,25 @@ async def on_message(message):
         GPT = True
         await message.channel.send('Active 😊')
         return
+
+    if prompt == 'save off' and message.author.id == PERSONAL_ID:
+        save = False
+        await message.channel.send('context saving turned off 🤐')
+        return
+
+    if prompt == 'save on' and message.author.id == PERSONAL_ID:
+        save = True
+        await message.channel.send('context saving turned on 😊')
+        return
     
     if message.author.id == PERSONAL_ID:
         if not message.guild:
             response = response_generator.get_response(prompt)
             await message.channel.send(response)
-        if message.guild and GPT:
-            response = response_generator.get_response(prompt)
-            await message.channel.send(response)
+        if message.guild:
+            if prompt.startswith('babe'):
+                prompt = message.content.lstrip("babe").strip() 
+                response = response_generator.get_response(prompt, save)
+                await message.channel.send(response)
 
 client.run(TOKEN)
