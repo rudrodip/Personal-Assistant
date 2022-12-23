@@ -11,7 +11,7 @@ GPT, save = False, False
 
 intents = discord.Intents.all()
 client = discord.Client(command_prefix="!", intents=intents)
-response_generator = process.Response('./TextProcessing/Database/config.json')
+response_generator = process.Response('./TextProcessing/config.json')
 
 async def send_img(message, url):
     async with aiohttp.ClientSession() as session: # creates session

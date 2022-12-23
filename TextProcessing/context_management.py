@@ -1,4 +1,4 @@
-from db import *
+from TextProcessing.db import *
 
 def personal_context():
     context = get_personal_data()

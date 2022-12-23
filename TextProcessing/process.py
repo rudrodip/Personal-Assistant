@@ -1,7 +1,7 @@
 import openai
 import os
 import json
-import context_management
+from TextProcessing import context_management
 
 OPEN_AI_TOKEN = os.environ['OPENAI']
 openai.api_key = OPEN_AI_TOKEN
@@ -70,10 +70,12 @@ class Response(TextProcessor):
         self.set_chat_log(text, response, self.author, self.bot)
 
         if text.startswith('remember'):
-            save = True
+            last_chat = [self.chat_log[-1]]
+            context_management.set_chat_log(context_management.chat_logs, self.string_repr(last_chat))
+            self.context = context_management.create_context(chat_refresh=True)
 
         if save and len(self.chat_log) >= self.max_length:
-            context_management.set_chat_log(context_management.chat_logs, self.string_repr())
+            context_management.set_chat_log(context_management.chat_logs, self.string_repr(self.chat_log))
             self.chat_log = []
             self.context = context_management.create_context(chat_refresh=True)
 
@@ -85,16 +87,16 @@ class Response(TextProcessor):
             author: prompt,
             bot: answer
         }
-        if len(self.chat.log) < self.max_length:
+        if len(self.chat_log) < self.max_length:
             self.chat_log.append(chat)
         else:
             self.chat_log.pop(0)
             self.chat_log.append(chat)
 
     # string representation of chat
-    def string_repr(self):
+    def string_repr(self, chat_logs):
         string = ''
-        for chat in self.chat.log:
+        for chat in chat_logs:
             for key in chat:
                 string += f'{key}: {chat[key]}\n'
         return string
