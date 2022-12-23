@@ -44,14 +44,12 @@ class Response(TextProcessor):
         self.bot = self.config["bot_name"]
 
     def get_context(self):
-        context = f'{self.context}\n'
-        for chat in self.chat_log:
-            ch = f'{self.author}: {chat[self.author]}\n{self.bot}: {chat[self.bot]}\n'
-            context += ch
+        string = self.string_repr(self.chat_log)
+        context = f'{self.context}\n{string}'
         
         return context
         
-    def get_response(self, text, save=False):
+    def get_response(self, text, author=None, save=False):
         if text == "hi":
             return "Hi ! 💙 😊"
 
@@ -59,15 +57,20 @@ class Response(TextProcessor):
 
         if text == 'get-context':
             print(self.context)
+            return 'debugged context'
 
         if text == 'get-context-full':
             print(context)
+            return 'debugging full context'
 
         prompt = f"{context}\n{self.author} : {text}"
         response = self.text_generator(prompt)
         response = response.lstrip(f'{self.bot}:').strip()
 
-        self.set_chat_log(text, response, self.author, self.bot)
+        if author:
+            self.set_chat_log(text, response, author, self.bot)
+        else:
+            self.set_chat_log(text, response, self.author, self.bot)
 
         if text.startswith('remember'):
             last_chat = [self.chat_log[-1]]

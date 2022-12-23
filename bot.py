@@ -70,6 +70,7 @@ async def on_message(message):
 
     if prompt == 'refresh' and message.author.id == PERSONAL_ID:
         PERMITTED_ACCOUNTS = db.get_accounts()
+        await message.channel.send('refreshed all permitted accounts 😊')
         return
     
     if message.author.id == PERSONAL_ID:
@@ -82,10 +83,9 @@ async def on_message(message):
                 response = response_generator.get_response(prompt, save)
                 await message.channel.send(response)
 
-    if message.author.id in PERMITTED_ACCOUNTS and prompt.startswith('sergio'):
+    if str(message.author.id) in PERMITTED_ACCOUNTS and prompt.startswith('sergio'):
         prompt = prompt.lstrip("sergio").strip()
-        prompt = f"I'm {PERMITTED_ACCOUNTS[message.author.id]}. {prompt}"
-        response = response_generator.get_response(prompt, save)
+        response = response_generator.get_response(prompt, author=PERMITTED_ACCOUNTS[str(message.author.id)], save=save)
         response = f'<@{message.author.id}> {response}'
         await message.channel.send(response)
 
