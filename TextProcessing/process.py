@@ -58,10 +58,10 @@ class Response(TextProcessor):
         context = self.get_context()
 
         if text == 'get-context':
-            return self.context
+            print(self.context)
 
         if text == 'get-context-full':
-            return context
+            print(context)
 
         prompt = f"{context}\n{self.author} : {text}"
         response = self.text_generator(prompt)
