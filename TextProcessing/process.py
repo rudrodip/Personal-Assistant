@@ -1,6 +1,7 @@
 import openai
 import os
 import json
+import context_management
 
 OPEN_AI_TOKEN = os.environ['OPENAI']
 openai.api_key = OPEN_AI_TOKEN
@@ -30,40 +31,70 @@ class TextProcessor:
             yield url['url']
 
 class Response(TextProcessor):
-    chat_log_path = "./TextProcessing/Database/chat_log.txt"
+    max_length = 50
+    chat_log = []
+    context = context_management.create_context()
+
     def __init__(self, config_path):
         # getting the config file
         with open(config_path, 'r') as f:
             self.config = json.load(f)
 
-        # getting previous chat log
-        with open(self.chat_log_path, 'r', encoding="utf-8") as f:
-            self.chat_log = f.read()
+        self.author = self.config["author_name"]
+        self.bot = self.config["bot_name"]
 
     def get_context(self):
-        personal_context = self.config["personal_context"]
-        chat_log = self.chat_log
-
-        context = f'{personal_context}\n{chat_log}'
-        return context
-
-    def create_context(self, author, text, response):
-        with open(self.chat_log_path, 'a', encoding="utf-8") as f:
-            print('writing to context...')
-            f.write(f"\n{author}: {text}\n{response}")
+        context = f'{self.context}\n'
+        for chat in self.chat_log:
+            ch = f'{self.author}: {chat[self.author]}\n{self.bot}: {chat[self.bot]}\n'
+            context += ch
         
-    def get_response(self, text):
+        return context
+        
+    def get_response(self, text, save=False):
         if text == "hi":
             return "Hi ! 💙 😊"
 
-        author = self.config["author_name"]
-        bot = self.config["bot_name"]
-
         context = self.get_context()
-        prompt = f"{context}\n{author} : {text}"
+
+        if text == 'get-context':
+            return self.context
+
+        if text == 'get-context-full':
+            return context
+
+        prompt = f"{context}\n{self.author} : {text}"
         response = self.text_generator(prompt)
+        response = response.lstrip(f'{self.bot}:').strip()
 
-        self.create_context(author, text, response)
+        self.set_chat_log(text, response, self.author, self.bot)
 
-        response = response.replace(f'{bot}:', '').strip()
+        if text.startswith('remember'):
+            save = True
+
+        if save and len(self.chat_log) >= self.max_length:
+            context_management.set_chat_log(context_management.chat_logs, self.string_repr())
+            self.chat_log = []
+            self.context = context_management.create_context(chat_refresh=True)
+
         return response
+
+    # append chat log
+    def set_chat_log(self, prompt, answer, author, bot):
+        chat = {
+            author: prompt,
+            bot: answer
+        }
+        if len(self.chat.log) < self.max_length:
+            self.chat_log.append(chat)
+        else:
+            self.chat_log.pop(0)
+            self.chat_log.append(chat)
+
+    # string representation of chat
+    def string_repr(self):
+        string = ''
+        for chat in self.chat.log:
+            for key in chat:
+                string += f'{key}: {chat[key]}\n'
+        return string
