@@ -13,6 +13,7 @@ chat_log_ref = context_ref.document('chat-log')
 personal_data_ref = context_ref.document('personal-data')
 bot_data_ref = context_ref.document('bot-data')
 memory_ref = context_ref.document('memory')
+acc_ref = db.collection('users')
 
 # getters
 def get_chat_log():
@@ -34,6 +35,14 @@ def get_memory():
     data = memory_ref.get()
     data = data.to_dict()
     return data
+
+def get_accounts():
+    users = acc_ref.stream()
+    ids = {}
+    for acc in users:
+        dic = acc.to_dict()
+        ids[dic['id']] = acc.id
+    return ids
 
 def set_description(prev_desc, new_desc):
     new_desc = prev_desc + new_desc

@@ -3,9 +3,11 @@ import discord
 import os
 import aiohttp
 from TextProcessing import process
+from TextProcessing import db
 
 TOKEN = os.environ["BABE"]
 PERSONAL_ID = 841126921886498817
+PERMITTED_ACCOUNTS = db.get_accounts()
 
 GPT, save = False, False
 
@@ -28,7 +30,7 @@ async def on_ready():
 @client.event
 async def on_message(message):
     global GPT, save
-    prompt = message.content
+    prompt = message.content.lower().strip()
     if message.author == client.user or message.author.id != PERSONAL_ID:
         pass
 
@@ -72,8 +74,15 @@ async def on_message(message):
             await message.channel.send(response)
         if message.guild:
             if prompt.startswith('babe'):
-                prompt = message.content.lstrip("babe").strip() 
+                prompt = prompt.lstrip("babe").strip() 
                 response = response_generator.get_response(prompt, save)
                 await message.channel.send(response)
+
+    if message.author.id in PERMITTED_ACCOUNTS and prompt.startswith('sergio'):
+        prompt = prompt.lstrip("sergio").strip()
+        prompt = f"I'm {PERMITTED_ACCOUNTS[message.author.id]}. {prompt}"
+        response = response_generator.get_response(prompt, save)
+        response = f'<@{message.author.id}> {response}'
+        await message.channel.send(response)
 
 client.run(TOKEN)
